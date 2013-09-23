@@ -1,6 +1,8 @@
 Preparables
 ===========
 
+[![Build Status](https://travis-ci.org/P2EE/preparables.png?branch=master)](https://travis-ci.org/P2EE/preparables)
+
 Preparables can be used as a base for creation of an object graph.
 They help to define requirements.
 
