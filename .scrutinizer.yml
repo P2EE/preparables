@@ -35,3 +35,6 @@ tools:
     php_loc:
         excluded_dirs:
             - vendor
+
+before_commands:
+    - composer install
