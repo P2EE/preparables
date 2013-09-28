@@ -32,6 +32,8 @@ abstract class Requirement {
 
     abstract public function isCacheable();
 
+    abstract public function getCacheKey();
+
     public function isRequired(){
         return $this->required == self::MODE_REQUIRED;
     }

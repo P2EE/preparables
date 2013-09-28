@@ -66,11 +66,12 @@ class Preparer {
      * @return mixed
      */
     protected function resolve(Requirement $requirement) {
-        $requirementHash = null;
+        $requirementHash = sha1(get_class($requirement).$requirement->getCacheKey());
         if ($requirement->isCacheable()) {
-            $requirementHash = spl_object_hash($requirement);
             if (isset($this->resolverCache[$requirementHash])) {
-                return $this->resolverCache[$requirementHash];
+                $data = $this->resolverCache[$requirementHash];
+                $this->checkRequirementData($requirement, $data);
+                return $data;
             }
         }
 
@@ -78,18 +79,26 @@ class Preparer {
             $data = $this->getResolver($requirement)->resolve($requirement, $this);
         } catch (\Exception $e) {
             $requirement->fail($e);
-            throw new \Exception('Requirement "' . $requirement->getKey() . '" is required but could not be resolved');
         }
 
-        if ($data === null && $requirement->isRequired()) {
-            $requirement->fail();
-            throw new \Exception('Requirement "' . $requirement->getKey() . '" is required but could not be resolved');
-        }
+        $this->checkRequirementData($requirement, $data);
 
-        if ($requirement->isCacheable() && $requirementHash !== null) {
+        if ($requirement->isCacheable()) {
             $this->resolverCache[$requirementHash] = $data;
         }
 
         return $data;
+    }
+
+    /**
+     * @param Requirement $requirement
+     * @param $data
+     * @throws \Exception
+     */
+    private function checkRequirementData(Requirement $requirement, $data) {
+        if ($data === null && $requirement->isRequired()) {
+            $requirement->fail();
+            throw new \Exception('Requirement "' . $requirement->getKey() . '" is required but could not be resolved');
+        }
     }
 }
