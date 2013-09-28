@@ -1,0 +1,8 @@
+name: P2EE/Preparables
+slogan: It's better to prepare your self
+markdown: redcarpet
+pygments: true
+repoaction: fork
+repourl: https://github.com/P2EE/preparables
+project: preparables
+baseurl: /preparables

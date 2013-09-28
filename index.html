@@ -1,0 +1,27 @@
+---
+layout: default
+title: Preparables - It's better to prepare your self
+---
+
+<div id="home">
+    <div id="about">
+        <h1>What are those Preparables?</h1>
+        <p>The <a href="https://github.com/P2EE" class="user-mention">@P2EE</a>/Preparables are a basic set of classes to get dependencie injection based on changing parameters.</p>
+    </div>
+
+    <div id="articles">
+        <ul class="posts">
+            {% for post in site.posts limit:5 %}
+            <li>
+                <article>
+                    <h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
+                    <span class="date">{{ post.date | date_to_string }}</span>
+                    <div class="article-content">
+                        {{ post.content }}
+                    </div>
+                </article>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

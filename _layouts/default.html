@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="/stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="/stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="/stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>{{ page.title }}</title>
+</head>
+
+<body>
+<header>
+    <div class="inner">
+        <h1><a href="{{ site.baseurl }}">{{ site.name }}</a></h1>
+        <h2>{{ site.slogan }}</h2>
+        {% if site.repoaction == "fork" %}
+        <a href="{{ site.repourl }}" class="button"><small>Fork on</small>GitHub</a>
+	{% else %}
+	<a href="{{ site.repourl }}" class="button"><small>Follow us on</small>GitHub</a>
+	{% endif %}
+    </div>
+</header>
+
+<div id="content-wrapper">
+    <div class="inner clearfix">
+        <section id="main-content">
+            {{ content }}
+        </section>
+
+        <aside id="sidebar">
+            <nav class="active projects">
+                <h3>Active projects</h3>
+                <ul>
+                    <li{% if site.project == "p2ee" %} class="active"{% endif %}><a href="http://p2ee.github.io/">the p2ee organisation</a></li>
+                    <li{% if site.project == "preparables" %} class="active"{% endif %}><a href="http://p2ee.github.io/preparables">p2ee/preparables</a></li>
+                    <li{% if site.project == "baserequirements" %} class="active"{% endif %}><a href="https://github.com/P2EE/baserequirements">p2ee/baserequirements</a></li>
+                    <li{% if site.project == "partlets" %} class="active"{% endif %}><a href="https://github.com/P2EE/partlets">p2ee/partlets</a></li>
+                </ul>
+            </nav>
+
+            <nav class="sleeping projects">
+                <h3>Sleeping projects</h3>
+                <ul>
+                    <li><a href="https://github.com/P2EE/serphplet">p2ee/serphplet</a></li>
+                    <li><a href="https://github.com/P2EE/petty">p2ee/petty</a></li>
+                </ul>
+            </nav>
+
+            <footer>
+                <p>This page is using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+            </footer>
+        </aside>
+    </div>
+</div>
+
+
+</body>
+</html>
