@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/p2ee/preparables.png?label=ready&title=Ready)](https://waffle.io/p2ee/preparables)
 Preparables
 ===========
 
