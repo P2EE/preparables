@@ -29,7 +29,7 @@ class Preparer {
      */
     public function prepare(Preparable $preparable, array $prefills = []) {
         $gen = $preparable->collect();
-        if (!($gen instanceof \Generator)) {
+        if (!$this->isGenerator($gen)) {
             return;
         }
 
@@ -100,5 +100,15 @@ class Preparer {
             $requirement->fail();
             throw new \Exception('Requirement "' . $requirement->getKey() . '" is required but could not be resolved');
         }
+    }
+
+    private function isGenerator($obj) {
+        if (class_exists('Generator')) {
+            return is_a($obj, 'Generator');
+        }
+        if (class_exists('Continuation')) {
+            return is_a($obj, 'Continuation');
+        }
+        return false;
     }
 }
