@@ -17,6 +17,11 @@ class Preparer {
     protected $resolverCache = [];
 
     /**
+     * @var array
+     */
+    protected $resolverSteps = [];
+
+    /**
      * @param array|Resolver[] $resolverMap
      */
     public function __construct($resolverMap) {
@@ -32,6 +37,22 @@ class Preparer {
         if (!$this->isGenerator($gen)) {
             return;
         }
+
+        // list of requirements
+
+        // iterate over requirement list
+
+                // get requirement uniq key
+
+                // add requirement to resolver
+
+                // run resolver
+
+                // eventual add new requirements to requirement list for next
+
+                // push data back
+
+            // if there are no more new data then break
 
         foreach ($gen as $requirementList) {
             foreach ($requirementList as $requirement) {
@@ -66,7 +87,7 @@ class Preparer {
      * @return mixed
      */
     protected function resolve(Requirement $requirement) {
-        $requirementHash = sha1(get_class($requirement).$requirement->getCacheKey());
+        $requirementHash = sha1(get_class($requirement) . $requirement->getCacheKey());
         if ($requirement->isCacheable()) {
             if (isset($this->resolverCache[$requirementHash])) {
                 $data = $this->resolverCache[$requirementHash];
@@ -75,6 +96,7 @@ class Preparer {
             }
         }
 
+        $data = null;
         try {
             $data = $this->getResolver($requirement)->resolve($requirement, $this);
         } catch (\Exception $e) {
