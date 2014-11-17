@@ -14,9 +14,9 @@ class PreparerTest extends \PHPUnit_Framework_TestCase {
 
         $requirement = new TestRequirement($testKey, false);
 
-        $preparable = $this->buildPreparable($requirement, $testKey, $testValue);
+        $preparable = $this->buildPreparableMock($requirement, $testKey, $testValue);
 
-        $resolver = $this->buildResolver($requirement, $testValue);
+        $resolver = $this->buildResolverMock($requirement, $testValue);
 
         $preparer = new Preparer([
             TestRequirement::class => $resolver
@@ -32,11 +32,11 @@ class PreparerTest extends \PHPUnit_Framework_TestCase {
         $requirement1 = new TestRequirement($testKey, true);
         $requirement2 = new TestRequirement($testKey, true);
 
-        $preparable1 = $preparable = $this->buildPreparable($requirement1, $testKey, $testValue);
+        $preparable1 = $preparable = $this->buildPreparableMock($requirement1, $testKey, $testValue);
 
-        $preparable2 = $preparable = $this->buildPreparable($requirement2, $testKey, $testValue);
+        $preparable2 = $preparable = $this->buildPreparableMock($requirement2, $testKey, $testValue);
 
-        $resolver = $this->buildResolver($requirement1, $testValue);
+        $resolver = $this->buildResolverMock($requirement1, $testValue);
 
         $preparer = new Preparer([
             TestRequirement::class => $resolver
@@ -52,9 +52,9 @@ class PreparerTest extends \PHPUnit_Framework_TestCase {
 
         $requirement = new TestRequirement($testKey, true);
 
-        $preparable = $this->buildPreparable($requirement, $testKey, $testValue);
+        $preparable = $this->buildPreparableMock($requirement, $testKey, $testValue);
 
-        $resolver = $this->buildResolver($requirement, $testValue, 0);
+        $resolver = $this->buildResolverMock($requirement, $testValue, 0);
 
         $preparer = new Preparer([
             TestRequirement::class => $resolver
@@ -69,9 +69,9 @@ class PreparerTest extends \PHPUnit_Framework_TestCase {
 
         $requirement = new TestRequirement($testKey, true);
 
-        $preparable = $this->buildPreparable($requirement, $testKey, $testValue);
+        $preparable = $this->buildPreparableMock($requirement, $testKey, $testValue);
 
-        $resolver = $this->buildResolver($requirement, $testValue, 1);
+        $resolver = $this->buildResolverMock($requirement, $testValue, 1);
 
         $preparer = new Preparer([
             TestRequirement::class => $resolver
@@ -86,7 +86,7 @@ class PreparerTest extends \PHPUnit_Framework_TestCase {
      * @param int $resolveCalls
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function buildResolver($requirement, $testValue, $resolveCalls = 1) {
+    protected function buildResolverMock($requirement, $testValue, $resolveCalls = 1) {
         if ($resolveCalls == 0) {
             $expectation = $this->never();
         } else if ($resolveCalls == 1) {
@@ -116,7 +116,7 @@ class PreparerTest extends \PHPUnit_Framework_TestCase {
      * @param $testValue
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function buildPreparable($requirement, $testKey, $testValue) {
+    protected function buildPreparableMock($requirement, $testKey, $testValue) {
         $preparable = $this->getMock(Preparable::class);
 
         $preparable->expects($this->once())
