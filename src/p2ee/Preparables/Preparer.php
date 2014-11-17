@@ -33,8 +33,8 @@ class Preparer {
      * @param array $prefills
      */
     public function prepare(Preparable $preparable, array $prefills = []) {
-        $gen = $preparable->collect();
-        if (!$this->isGenerator($gen)) {
+        $generator = $preparable->collect();
+        if (!$this->isGenerator($generator)) {
             return;
         }
 
@@ -54,7 +54,7 @@ class Preparer {
 
             // if there are no more new data then break
 
-        foreach ($gen as $requirementList) {
+        foreach ($generator as $requirementList) {
             foreach ($requirementList as $requirement) {
                 /** @var Requirement $requirement */
                 if (isset($prefills[$requirement->getKey()])) {
