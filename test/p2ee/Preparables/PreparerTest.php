@@ -52,7 +52,7 @@ class PreparerTest extends \PHPUnit_Framework_TestCase {
 
         $requirement = new TestRequirement($testKey, true);
 
-        $preparable = $preparable = $this->buildPreparable($requirement, $testKey, $testValue);
+        $preparable = $this->buildPreparable($requirement, $testKey, $testValue);
 
         $resolver = $this->buildResolver($requirement, $testValue, 0);
 
@@ -69,7 +69,7 @@ class PreparerTest extends \PHPUnit_Framework_TestCase {
 
         $requirement = new TestRequirement($testKey, true);
 
-        $preparable = $preparable = $this->buildPreparable($requirement, $testKey, $testValue);
+        $preparable = $this->buildPreparable($requirement, $testKey, $testValue);
 
         $resolver = $this->buildResolver($requirement, $testValue, 1);
 
