@@ -3,9 +3,6 @@ namespace p2ee\Preparables;
 
 /**
  * @service
- *
- * Class Preparer
- * @package p2ee\Preparables
  */
 class Preparer {
 

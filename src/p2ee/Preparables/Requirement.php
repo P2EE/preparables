@@ -1,10 +1,6 @@
 <?php
 namespace p2ee\Preparables;
 
-/**
- * Class Requirement
- * @package p2ee\Preparables
- */
 abstract class Requirement {
 
     const MODE_OPTIONAL = 'opt';

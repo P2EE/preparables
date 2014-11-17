@@ -1,10 +1,6 @@
 <?php
 namespace p2ee\Preparables;
 
-/**
- * Interface Preparable
- * @package p2ee\Preparables
- */
 interface Preparable {
 
     public function collect();
