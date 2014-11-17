@@ -1,6 +1,10 @@
 <?php
 namespace p2ee\Preparables;
 
+/**
+ * Interface Resolver
+ * @package p2ee\Preparables
+ */
 interface Resolver {
 
     /**

@@ -1,7 +1,14 @@
 <?php
 namespace p2ee\Preparables;
 
+/**
+ * Class Requirement
+ * @package p2ee\Preparables
+ */
 abstract class Requirement {
+
+    const MODE_OPTIONAL = 'opt';
+    const MODE_REQUIRED = 'req';
 
     /**
      * @var bool
@@ -22,9 +29,6 @@ abstract class Requirement {
      * @var string
      */
     protected $required = self::MODE_REQUIRED;
-
-    const MODE_OPTIONAL = 'opt';
-    const MODE_REQUIRED = 'req';
 
     public function getKey(){
         return $this->key;
