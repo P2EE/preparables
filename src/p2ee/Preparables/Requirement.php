@@ -30,20 +30,32 @@ abstract class Requirement {
      */
     protected $required = self::MODE_REQUIRED;
 
-    public function getKey(){
-        return $this->key;
-    }
-
     abstract public function isCacheable();
 
     abstract public function getCacheKey();
 
+    /**
+     * @return string
+     */
+    public function getKey(){
+        return $this->key;
+    }
+
+    /**
+     * @return bool
+     */
     public function isRequired(){
         return $this->required == self::MODE_REQUIRED;
     }
 
-    public function fail($e = null){
+    /**
+     * @param \Exception $exception
+     */
+    public function fail(\Exception $exception = null){
         $this->isFailed = true;
-        $this->failInformation[] = $e;
+
+        if ($exception) {
+            $this->failInformation[] = $exception;
+        }
     }
 } 
