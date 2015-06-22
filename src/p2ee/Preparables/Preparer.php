@@ -55,6 +55,9 @@ class Preparer {
             // collect one iteration over all active preperables
             $toUnset = [];
             foreach ($generators as $preperableHash => $generatorItem) {
+                if (defined('HHVM_VERSION')) {
+                    $generatorItem->next();
+                }
                 if (!$generatorItem->valid()) {
                     $toUnset[] = $preperableHash;
                     continue;
