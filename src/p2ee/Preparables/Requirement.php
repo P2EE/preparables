@@ -30,6 +30,8 @@ abstract class Requirement {
 
     abstract public function getCacheKey();
 
+    abstract public function getPrefills();
+
     /**
      * @return string
      */

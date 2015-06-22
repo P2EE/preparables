@@ -32,37 +32,77 @@ class Preparer {
      * @param Preparable $preparable
      * @param array $prefills
      */
-    public function prepare(Preparable $preparable, array $prefills = []) {
+    public function prepare(Preparable $preparable, $prefills = []) {
         $generator = $preparable->collect();
         if (!$this->isGenerator($generator)) {
             return;
         }
 
-        // list of requirements
+        /** @var \Generator[] $generators */
+        $generators = [];
+        $generators[spl_object_hash($preparable)] = $generator;
 
-        // iterate over requirement list
+        /** @var Preparable[] $preparables */
+        $preparables = [];
+        $preparables[spl_object_hash($preparable)] = $preparable;
 
-                // get requirement uniq key
+        $prefillList = [];
+        $prefillList[spl_object_hash($preparable)] = $prefills;
 
-                // add requirement to resolver
-
-                // run resolver
-
-                // eventual add new requirements to requirement list for next
-
-                // push data back
-
-            // if there are no more new data then break
-
-        foreach ($generator as $requirementList) {
-            foreach ($requirementList as $requirement) {
-                /** @var Requirement $requirement */
-                if (isset($prefills[$requirement->getKey()])) {
-                    $preparable->inject($requirement->getKey(), $prefills[$requirement->getKey()]);
-                } else {
-                    $resolvedData = $this->resolve($requirement);
-                    $preparable->inject($requirement->getKey(), $resolvedData);
+        $isDone = false;
+        while (!$isDone) {
+            $requirementsToResolve = [];
+            // collect one iteration over all active preperables
+            $toUnset = [];
+            foreach ($generators as $preperableHash => $generatorItem) {
+                if (!$generatorItem->valid()) {
+                    $toUnset[] = $preperableHash;
+                    continue;
                 }
+                /** @var Requirement[] $items */
+                $items = $generatorItem->current();
+                foreach ($items as $requirement) {
+                    $class = get_class($requirement);
+                    if (!isset($requirementsToResolve[$class])) {
+                        $requirementsToResolve[$class] = [];
+                    }
+                    if (!isset($requirementsToResolve[$class][$preperableHash])) {
+                        $requirementsToResolve[$class][$preperableHash] = [];
+                    }
+
+                    $requirementsToResolve[$class][$preperableHash][] = $requirement;
+                }
+                $generatorItem->next();
+            }
+
+            foreach ($toUnset as $hash) {
+                unset($generators[$hash]);
+            }
+
+            // resolve one iteration
+            foreach ($requirementsToResolve as $class => $requirementList) {
+                $resolverResultList = $this->resolveList($requirementList, $prefillList);
+                foreach ($resolverResultList as $preperableHash => $resultList) {
+                    if (!isset($preparables[$preperableHash])) {
+                        continue;
+                    }
+                    $tmpPreperable = $preparables[$preperableHash];
+                    foreach ($resultList as $key => $results) {
+                        foreach ($results as $result) {
+                            $tmpPreperable->inject($key, $result['data']);
+                            // if a result is a preperable itself add to generator and preperable list
+                            if ($result['data'] instanceof Preparable) {
+                                $generators[spl_object_hash($result['data'])] = $result['data']->collect();
+                                $preparables[spl_object_hash($result['data'])] = $result['data'];
+                                $prefillList[spl_object_hash($result['data'])] = $result['requirement']->getPrefills();
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (count($generators) == 0) {
+                $isDone = true;
             }
         }
     }
@@ -110,6 +150,35 @@ class Preparer {
         }
 
         return $data;
+    }
+
+    /**
+     * @param Requirement[][] $requirements
+     * @return array
+     */
+    protected function resolveList(array $requirements, $prefillList) {
+        $result = [];
+        foreach($requirements as $hash => $requirementList) {
+            $result[$hash] = [];
+            foreach($requirementList as $requirement) {
+                $prefills = [];
+                if ($prefillList[$hash]) {
+                    $prefills = $prefillList[$hash];
+                }
+                if (isset($prefills[$requirement->getKey()])) {
+                    $result[$hash][$requirement->getKey()][] = [
+                        'data' => $prefills[$requirement->getKey()],
+                        'requirement' => $requirement
+                    ];
+                } else {
+                    $result[$hash][$requirement->getKey()][] = [
+                        'data' => $this->resolve($requirement),
+                        'requirement' => $requirement
+                    ];
+                }
+            }
+        }
+        return $result;
     }
 
     /**

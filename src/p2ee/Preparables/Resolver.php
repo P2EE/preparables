@@ -5,10 +5,9 @@ interface Resolver {
 
     /**
      * @param Requirement $requirement
-     * @param Preparer $preparer
      * @return mixed
      */
-    public function resolve(Requirement $requirement, Preparer $preparer);
+    public function resolve(Requirement $requirement);
 
     /**
      * @return string

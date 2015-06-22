@@ -155,4 +155,8 @@ class TestRequirement extends Requirement {
     public function getCacheKey() {
         return $this->getKey();
     }
+
+    public function getPrefills() {
+        return [];
+    }
 }
