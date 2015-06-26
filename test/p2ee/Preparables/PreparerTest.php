@@ -103,8 +103,7 @@ class PreparerTest extends \PHPUnit_Framework_TestCase {
         } else {
             $resolver->expects($expectation)
                 ->method('resolve')->with(
-                    $this->identicalTo($requirement),
-                    $this->isInstanceOf(Preparer::class)
+                    $this->identicalTo($requirement)
                 )->will($this->returnValue($testValue));
         }
         return $resolver;

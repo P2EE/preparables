@@ -7,6 +7,21 @@ namespace p2ee\Preparables;
 class Preparer {
 
     /**
+     * @var Preparable[]
+     */
+    protected $preparables = [];
+
+    /**
+     * @var array
+     */
+    protected $prefillList = [];
+
+    /**
+     * @var \Generator[]
+     */
+    protected $generators = [];
+
+    /**
      * @var array|Resolver[]
      */
     protected $resolverMap = [];
@@ -30,83 +45,68 @@ class Preparer {
 
     /**
      * @param Preparable $preparable
-     * @param array $prefills
+     * @return bool
      */
-    public function prepare(Preparable $preparable, $prefills = []) {
+    protected function addGeneratorFormPreparable(Preparable $preparable) {
         $generator = $preparable->collect();
         if (!$this->isGenerator($generator)) {
-            return;
+            return false;
         }
 
         /** @var \Generator[] $generators */
-        $generators = [];
-        $generators[spl_object_hash($preparable)] = $generator;
+        $this->generators[spl_object_hash($preparable)] = $generator;
+        return true;
+    }
 
-        /** @var Preparable[] $preparables */
-        $preparables = [];
-        $preparables[spl_object_hash($preparable)] = $preparable;
-
-        $prefillList = [];
-        $prefillList[spl_object_hash($preparable)] = $prefills;
-
-        $isDone = false;
-        while (!$isDone) {
-            $requirementsToResolve = [];
-            // collect one iteration over all active preperables
+    /**
+     * @return \Generator
+     */
+    protected function generatorItems() {
+        $initializedGenerators = [];
+        while (true) {
+            $generatorsToReturn = [];
             $toUnset = [];
-            foreach ($generators as $preperableHash => $generatorItem) {
-                if (defined('HHVM_VERSION')) {
+            foreach ($this->generators as $preparableHash => $generatorItem) {
+                if (defined('HHVM_VERSION') && !isset($initializedGenerators[$preparableHash])) {
+                    $initializedGenerators[$preparableHash] = true;
                     $generatorItem->next();
                 }
-                if (!$generatorItem->valid()) {
-                    $toUnset[] = $preperableHash;
-                    continue;
-                }
-                /** @var Requirement[] $items */
-                $items = $generatorItem->current();
-                foreach ($items as $requirement) {
-                    $class = get_class($requirement);
-                    if (!isset($requirementsToResolve[$class])) {
-                        $requirementsToResolve[$class] = [];
-                    }
-                    if (!isset($requirementsToResolve[$class][$preperableHash])) {
-                        $requirementsToResolve[$class][$preperableHash] = [];
-                    }
 
-                    $requirementsToResolve[$class][$preperableHash][] = $requirement;
+                if ($generatorItem->valid()) {
+                    $generatorsToReturn[$preparableHash] = $generatorItem;
+                } else {
+                    $toUnset[] = $preparableHash;
                 }
-                $generatorItem->next();
             }
 
             foreach ($toUnset as $hash) {
-                unset($generators[$hash]);
+                unset($this->generators[$hash]);
             }
 
-            // resolve one iteration
-            foreach ($requirementsToResolve as $class => $requirementList) {
-                $resolverResultList = $this->resolveList($requirementList, $prefillList);
-                foreach ($resolverResultList as $preperableHash => $resultList) {
-                    if (!isset($preparables[$preperableHash])) {
-                        continue;
-                    }
-                    $tmpPreperable = $preparables[$preperableHash];
-                    foreach ($resultList as $key => $results) {
-                        foreach ($results as $result) {
-                            $tmpPreperable->inject($key, $result['data']);
-                            // if a result is a preperable itself add to generator and preperable list
-                            if ($result['data'] instanceof Preparable) {
-                                $generators[spl_object_hash($result['data'])] = $result['data']->collect();
-                                $preparables[spl_object_hash($result['data'])] = $result['data'];
-                                $prefillList[spl_object_hash($result['data'])] = $result['requirement']->getPrefills();
-                            }
-                        }
-                    }
-                }
+            if (count($generatorsToReturn) == 0) {
+                break;
+            } else {
+                yield $generatorsToReturn;
             }
+        }
+    }
 
-            if (count($generators) == 0) {
-                $isDone = true;
-            }
+    /**
+     * @param Preparable $preparable
+     * @param array $prefills
+     */
+    public function prepare(Preparable $preparable, $prefills = []) {
+        if (!$this->addGeneratorFormPreparable($preparable)) {
+            return;
+        }
+        $this->addPreparable($preparable);
+
+        $this->addPreparablePrefill($preparable, $prefills);
+
+        foreach ($this->generatorItems() as $generators) {
+            $requirementsToResolve = $this->collectRequirementList($generators);
+
+            $this->resolveRequirementList($requirementsToResolve);
         }
     }
 
@@ -141,7 +141,7 @@ class Preparer {
 
         $data = null;
         try {
-            $data = $this->getResolver($requirement)->resolve($requirement, $this);
+            $data = $this->getResolver($requirement)->resolve($requirement);
         } catch (\Exception $e) {
             $requirement->fail($e);
         }
@@ -159,26 +159,29 @@ class Preparer {
      * @param Requirement[][] $requirements
      * @return array
      */
-    protected function resolveList(array $requirements, $prefillList) {
+    protected function resolveList(array $requirements) {
         $result = [];
-        foreach($requirements as $hash => $requirementList) {
+        foreach ($requirements as $hash => $requirementList) {
             $result[$hash] = [];
-            foreach($requirementList as $requirement) {
-                $prefills = [];
-                if ($prefillList[$hash]) {
-                    $prefills = $prefillList[$hash];
-                }
-                if (isset($prefills[$requirement->getKey()])) {
-                    $result[$hash][$requirement->getKey()][] = [
-                        'data' => $prefills[$requirement->getKey()],
-                        'requirement' => $requirement
-                    ];
+            foreach ($requirementList as $requirement) {
+                $data = null;
+                if (isset($this->prefillList[$hash]) && isset($this->prefillList[$hash][$requirement->getKey()])) {
+                    $data = $this->prefillList[$hash][$requirement->getKey()];
+                    unset($this->prefillList[$hash][$requirement->getKey()]);
                 } else {
-                    $result[$hash][$requirement->getKey()][] = [
-                        'data' => $this->resolve($requirement),
-                        'requirement' => $requirement
-                    ];
+                    $data = $this->resolve($requirement);
                 }
+
+                if (!isset($result[$hash][$requirement->getKey()])) {
+                    $result[$hash][$requirement->getKey()] = [];
+                }
+                $result[$hash][$requirement->getKey()][] = $data;
+                if ($data instanceof Preparable) {
+                    $this->addGeneratorFormPreparable($data);
+                    $this->addPreparable($data);
+                    $this->addPreparablePrefill($data, $requirement->getPrefills());
+                }
+
             }
         }
         return $result;
@@ -204,5 +207,68 @@ class Preparer {
             return is_a($obj, 'Continuation');
         }
         return false;
+    }
+
+    /**
+     * @param Preparable $preparable
+     */
+    protected function addPreparable(Preparable $preparable) {
+        /** @var Preparable[] $preparables */
+        $this->preparables[spl_object_hash($preparable)] = $preparable;
+    }
+
+    /**
+     * @param Preparable $preparable
+     * @param $prefills
+     */
+    protected function addPreparablePrefill(Preparable $preparable, $prefills) {
+        $this->prefillList[spl_object_hash($preparable)] = $prefills;
+    }
+
+    /**
+     * @param \Generator[] $generators
+     * @return Requirement[][][]
+     */
+    protected function collectRequirementList($generators) {
+        $requirementsToResolve = [];
+
+        foreach ($generators as $preparableHash => $generatorItem) {
+            /** @var Requirement[] $items */
+            $items = $generatorItem->current();
+            foreach ($items as $requirement) {
+                $class = get_class($requirement);
+                if (!isset($requirementsToResolve[$class])) {
+                    $requirementsToResolve[$class] = [];
+                }
+                if (!isset($requirementsToResolve[$class][$preparableHash])) {
+                    $requirementsToResolve[$class][$preparableHash] = [];
+                }
+
+                $requirementsToResolve[$class][$preparableHash][] = $requirement;
+            }
+            $generatorItem->next();
+        }
+        return $requirementsToResolve;
+    }
+
+    /**
+     * @param $requirementsToResolve
+     */
+    protected function resolveRequirementList($requirementsToResolve) {
+        // resolve one iteration
+        foreach ($requirementsToResolve as $class => $requirementList) {
+            $resolverResultList = $this->resolveList($requirementList);
+            foreach ($resolverResultList as $preparableHash => $resultList) {
+                if (!isset($this->preparables[$preparableHash])) {
+                    continue;
+                }
+                $tmpPreparable = $this->preparables[$preparableHash];
+                foreach ($resultList as $key => $results) {
+                    foreach ($results as $result) {
+                        $tmpPreparable->inject($key, $result);
+                    }
+                }
+            }
+        }
     }
 }
