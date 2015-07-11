@@ -6,7 +6,7 @@ php:
   - nightly
   - hhvm
 
-before_script:
+install:
   composer --dev install
 
 script:
@@ -15,7 +15,7 @@ script:
 after_script:
   - wget https://scrutinizer-ci.com/ocular.phar
   - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
-  
+
 matrix:
   allow_failures:
     - php: nightly
