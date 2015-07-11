@@ -16,7 +16,7 @@
         "php": ">=5.4.99"
     },
     "autoload": {
-        "psr-0": {"p2ee\\": "src/"}
+        "psr-4": {"p2ee\\Preparables\\": "src/"}
     },
     "config" : {
         "bin-dir" : "vendor/bin/"
