@@ -9,6 +9,10 @@ php:
   - nightly
   - hhvm
 
+cache:
+  directories:
+    - $HOME/.composer/cache
+
 before_script:
   composer --dev install
 
