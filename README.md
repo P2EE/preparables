@@ -2,7 +2,7 @@ Preparables
 ===========
 
 [![Stories in Ready](https://badge.waffle.io/p2ee/preparables.png?label=ready&title=Ready)](https://waffle.io/p2ee/preparables)
-[![Build Status](https://travis-ci.org/P2EE/preparables.png?branch=master)](https://travis-ci.org/P2EE/preparables)
+[![Build Status](https://travis-ci.org/P2EE/preparables.svg?branch=master)](https://travis-ci.org/P2EE/preparables)
 [![Dependency Status](http://www.versioneye.com/user/projects/524158c7632bac486600582a/badge.png)](http://www.versioneye.com/user/projects/524158c7632bac486600582a)
 [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/P2EE/preparables/badges/quality-score.png?s=9f70d3ad93f4d9ef259596718f00387f6b4e506a)](https://scrutinizer-ci.com/g/P2EE/preparables/)
 [![Code Coverage](https://scrutinizer-ci.com/g/P2EE/preparables/badges/coverage.png?s=54a54725a9e956b1acd2ed16cfa30fb6f84da2b5)](https://scrutinizer-ci.com/g/P2EE/preparables/)
