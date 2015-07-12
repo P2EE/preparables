@@ -144,6 +144,7 @@ class Preparer {
             $data = $this->getResolver($requirement)->resolve($requirement);
         } catch (\Exception $e) {
             $requirement->fail($e);
+            return null;
         }
 
         $this->checkRequirementData($requirement, $data);
