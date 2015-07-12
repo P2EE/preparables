@@ -2,7 +2,7 @@
     "name": "p2ee/preparables",
     "description": "Base package for preparable systems",
     "require-dev": {
-        "phpunit/phpunit": "4.1.*"
+        "phpunit/phpunit": "~4.1"
     },
     "license": "MIT",
     "authors": [
