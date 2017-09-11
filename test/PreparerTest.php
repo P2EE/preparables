@@ -1,7 +1,7 @@
 <?php
 namespace p2ee\Preparables;
 
-class PreparerTest extends \PHPUnit_Framework_TestCase {
+class PreparerTest extends \PHPUnit\Framework\TestCase {
 
     public function testCreation() {
         $preparer = new Preparer([]);
@@ -34,7 +34,7 @@ class PreparerTest extends \PHPUnit_Framework_TestCase {
         /**
          * @var $preparable \PHPUnit_Framework_MockObject_MockObject | Preparable
          */
-        $preparable = $this->getMock(Preparable::class);
+        $preparable = $this->getMockBuilder(Preparable::class)->getMock();
 
         $preparable->expects($this->once())
             ->method('collect')
@@ -81,7 +81,7 @@ class PreparerTest extends \PHPUnit_Framework_TestCase {
         /**
          * @var $preparable \PHPUnit_Framework_MockObject_MockObject | Preparable
          */
-        $preparable = $this->getMock(Preparable::class);
+        $preparable = $this->getMockBuilder(Preparable::class)->getMock();
 
         $preparable->expects($this->once())
             ->method('collect')
@@ -115,7 +115,7 @@ class PreparerTest extends \PHPUnit_Framework_TestCase {
         /**
          * @var $preparable \PHPUnit_Framework_MockObject_MockObject | Preparable
          */
-        $preparable = $this->getMock(Preparable::class);
+        $preparable = $this->getMockBuilder(Preparable::class)->getMock();
 
         $preparable->expects($this->once())
             ->method('collect')
@@ -143,7 +143,7 @@ class PreparerTest extends \PHPUnit_Framework_TestCase {
         $requirement1 = new TestRequirement($testKey1, true);
         $requirement2 = new TestRequirement($testKey2, true);
 
-        $preparable2 = $this->getMock(Preparable::class);
+        $preparable2 = $this->getMockBuilder(Preparable::class)->getMock();
         $preparable2->expects($this->once())
             ->method('collect')
             ->will($this->returnCallback(function () use ($requirement2) {
@@ -161,7 +161,7 @@ class PreparerTest extends \PHPUnit_Framework_TestCase {
 
 
         /** @var \PHPUnit_Framework_MockObject_MockObject | Preparable $preparable1 */
-        $preparable1 = $this->getMock(Preparable::class);
+        $preparable1 = $this->getMockBuilder(Preparable::class)->getMock();
         $callback = function () use ($requirement1) {
             yield [
                 $requirement1
@@ -178,7 +178,7 @@ class PreparerTest extends \PHPUnit_Framework_TestCase {
                 $this->identicalTo($preparable2)
             );
 
-        $resolver = $this->getMock(Resolver::class);
+        $resolver = $this->getMockBuilder(Resolver::class)->getMock();
         $resolver->expects($this->any())
             ->method('resolve')->with(
                 $this->isInstanceOf(Requirement::class)
@@ -274,7 +274,7 @@ class PreparerTest extends \PHPUnit_Framework_TestCase {
             $expectation = $this->exactly($resolveCalls);
         }
 
-        $resolver = $this->getMock(Resolver::class);
+        $resolver = $this->getMockBuilder(Resolver::class)->getMock();
 
         if ($resolveCalls == 0) {
             $resolver->expects($expectation)
@@ -295,7 +295,7 @@ class PreparerTest extends \PHPUnit_Framework_TestCase {
      * @return \PHPUnit_Framework_MockObject_MockObject | Preparable
      */
     protected function buildPreparableMock($requirement, $testKey, $testValue) {
-        $preparable = $this->getMock(Preparable::class);
+        $preparable = $this->getMockBuilder(Preparable::class)->getMock();
 
         $preparable->expects($this->once())
             ->method('collect')
